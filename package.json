@@ -1,0 +1,13 @@
+{
+  "name": "tree-interface",
+  "version": "1.0.0",
+  "description": "Interface com estrutura de árvore e PostgreSQL",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "pg": "^8.14.1"
+  }
+}

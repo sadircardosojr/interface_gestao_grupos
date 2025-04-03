@@ -1,0 +1,425 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f0f2f5;
+}
+
+.container {
+    display: flex;
+    height: 100vh;
+    padding: 20px;
+    gap: 20px;
+    min-width: 800px;
+}
+
+.tree-container {
+    min-width: 250px;
+    max-width: 300px;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    overflow-y: auto;
+    flex-shrink: 0;
+}
+
+.content-container {
+    flex: 1;
+    min-width: 400px;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    overflow-x: auto;
+}
+
+.tree-item {
+    margin: 8px 0;
+}
+
+.tree-item-content {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    color: #333;
+}
+
+.tree-item-content:hover {
+    background-color: #f8f9fa;
+    transform: translateX(5px);
+}
+
+.tree-item-content.selected {
+    background-color: #e3f2fd;
+    color: #1976d2;
+    font-weight: 500;
+}
+
+.tree-item-children {
+    margin-left: 24px;
+    display: none;
+    border-left: 2px solid #e0e0e0;
+    padding-left: 8px;
+}
+
+.tree-item-children.expanded {
+    display: block;
+}
+
+.toggle-icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background-color: #f0f0f0;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.toggle-icon:hover {
+    background-color: #e0e0e0;
+}
+
+.toggle-icon::before {
+    content: '+';
+    font-size: 18px;
+    font-weight: bold;
+    color: #666;
+}
+
+.tree-item.expanded .toggle-icon::before {
+    content: '-';
+}
+
+.leaf-node .toggle-icon {
+    visibility: hidden;
+}
+
+#content {
+    padding: 20px;
+    color: #333;
+}
+
+#content h2 {
+    margin-bottom: 20px;
+    color: #1976d2;
+    border-bottom: 2px solid #e3f2fd;
+    padding-bottom: 10px;
+}
+
+.condition-builder {
+    margin-top: 20px;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    min-height: 200px;
+}
+
+.condition-toolbox {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.condition-item {
+    padding: 8px 12px;
+    background-color: #e3f2fd;
+    border-radius: 4px;
+    cursor: move;
+    user-select: none;
+    border: 1px solid #90caf9;
+    transition: all 0.2s ease;
+}
+
+.condition-item:hover {
+    background-color: #bbdefb;
+    transform: translateY(-2px);
+}
+
+.condition-item.dragging {
+    opacity: 0.5;
+}
+
+.condition-dropzone {
+    min-height: 50px;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border: 2px dashed #ddd;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    transition: all 0.2s ease;
+}
+
+.condition-dropzone.highlight {
+    border-color: #87CEEB;
+    background-color: #e3f2fd;
+}
+
+.condition-sequence {
+    min-height: 100px;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.drop-indicator {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background-color: #87CEEB;
+    pointer-events: none;
+    z-index: 1;
+    display: none;
+    box-shadow: 0 0 5px rgba(135, 206, 235, 0.5);
+}
+
+.drop-indicator.visible {
+    display: block;
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 0.5;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0.5;
+    }
+}
+
+.condition-block {
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 10px;
+    margin-bottom: 10px;
+    cursor: move;
+    position: relative;
+    transition: all 0.2s ease;
+    z-index: 0;
+}
+
+.condition-block.dragging {
+    opacity: 0.5;
+    background-color: #f8f9fa;
+    z-index: 2;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.condition-block .drag-handle {
+    cursor: move;
+    padding: 5px;
+    color: #666;
+}
+
+.condition-block .drag-handle:hover {
+    color: #333;
+}
+
+.condition-block .condition-inputs {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: calc(100% - 100px);
+}
+
+.condition-block .input-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    width: 100%;
+}
+
+.condition-block .input-row label {
+    min-width: 80px;
+    color: #666;
+    font-size: 0.9em;
+    flex-shrink: 0;
+}
+
+.condition-block .input-row input,
+.condition-block .input-row select {
+    flex: 1;
+    min-width: 0;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: white;
+    width: 100%;
+}
+
+.condition-block .input-row select {
+    min-width: 150px;
+    max-width: 200px;
+    flex-shrink: 0;
+}
+
+.condition-block .input-row input:focus,
+.condition-block .input-row select:focus {
+    outline: none;
+    border-color: #1976d2;
+    box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.1);
+}
+
+.condition-block .remove-btn {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 8px 12px;
+    background-color: #ffebee;
+    color: #c62828;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    white-space: nowrap;
+    font-size: 0.9em;
+    width: 80px;
+    text-align: center;
+}
+
+.condition-block .remove-btn:hover {
+    background-color: #ffcdd2;
+}
+
+.button-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    justify-content: flex-end;
+}
+
+.edit-button,
+.save-button {
+    margin-top: 0;
+    padding: 10px 20px;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s;
+    min-width: 150px;
+}
+
+.edit-button {
+    background-color: #4caf50;
+}
+
+.edit-button:hover {
+    background-color: #388e3c;
+}
+
+.edit-button:disabled {
+    background-color: #a5d6a7;
+    cursor: not-allowed;
+}
+
+.save-button {
+    background-color: #1976d2;
+}
+
+.save-button:hover {
+    background-color: #1565c0;
+}
+
+.save-button:disabled {
+    background-color: #90caf9;
+    cursor: not-allowed;
+}
+
+.condition-builder.editing .condition-block {
+    background-color: #fff3e0;
+    border: 1px solid #ffb74d;
+    padding-right: 100px;
+}
+
+.condition-builder.editing .condition-inputs input,
+.condition-builder.editing .condition-inputs select {
+    background-color: white;
+    border: 1px solid #ffb74d;
+}
+
+.condition-builder:not(.editing) .condition-toolbox,
+.condition-builder:not(.editing) .condition-dropzone,
+.condition-builder:not(.editing) .condition-block {
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+.condition-builder:not(.editing) .condition-block {
+    background-color: #f5f5f5;
+    border: 1px solid #e0e0e0;
+}
+
+.condition-builder:not(.editing) .condition-inputs input,
+.condition-builder:not(.editing) .condition-inputs select {
+    background-color: #f5f5f5;
+    border: 1px solid #e0e0e0;
+    color: #666;
+    cursor: not-allowed;
+}
+
+.condition-builder:not(.editing) .condition-dropzone {
+    border: 2px dashed #e0e0e0;
+    background-color: #f5f5f5;
+}
+
+.condition-builder:not(.editing) .condition-item {
+    background-color: #e0e0e0;
+    border: 1px solid #bdbdbd;
+    cursor: not-allowed;
+}
+
+.condition-builder.editing .condition-toolbox,
+.condition-builder.editing .condition-dropzone,
+.condition-builder.editing .condition-block {
+    pointer-events: auto;
+    opacity: 1;
+}
+
+.condition-builder.editing .condition-block {
+    background-color: #fff3e0;
+    border: 1px solid #ffb74d;
+}
+
+.condition-builder.editing .condition-inputs input,
+.condition-builder.editing .condition-inputs select {
+    background-color: white;
+    border: 1px solid #ffb74d;
+    color: #333;
+    cursor: text;
+}
+
+.condition-builder.editing .condition-dropzone {
+    border: 2px dashed #ffb74d;
+    background-color: #fff3e0;
+}
+
+.condition-builder.editing .condition-item {
+    background-color: #e3f2fd;
+    border: 1px solid #90caf9;
+    cursor: move;
+} 
