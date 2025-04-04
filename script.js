@@ -178,7 +178,7 @@ class TreeView {
             </div>
         `;
 
-        this.setupDragAndDrop();
+        //this.setupDragAndDrop();
         this.loadSavedConditions(node.id);
         this.setupEditMode();
 
@@ -415,7 +415,10 @@ class TreeView {
             const type = e.dataTransfer.getData('type');
             const draggingBlock = document.querySelector('.condition-block.dragging');
 
-            if (draggingBlock) {
+            if (type === 'new') {
+                const conditionType = e.dataTransfer.getData('conditionType');
+                this.addConditionBlock(conditionType);
+            } else if (draggingBlock) {
                 const afterElement = this.getDragAfterElement(sequence, e.clientY);
                 if (afterElement) {
                     sequence.insertBefore(draggingBlock, afterElement);
@@ -444,25 +447,16 @@ class TreeView {
             dropzone.classList.remove('highlight');
         });
 
-        let isProcessingDrop = false;
-
         dropzone.addEventListener('drop', (e) => {
             e.preventDefault();
             e.stopPropagation();
             dropzone.classList.remove('highlight');
-
-            if (isProcessingDrop) return;
-            isProcessingDrop = true;
 
             const type = e.dataTransfer.getData('type');
             if (type === 'new') {
                 const conditionType = e.dataTransfer.getData('conditionType');
                 this.addConditionBlock(conditionType);
             }
-
-            setTimeout(() => {
-                isProcessingDrop = false;
-            }, 100);
         });
 
         // Configurar botão de salvar
