@@ -88,7 +88,7 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para ma
 
 ## 👤 Autor
 
-Seu Nome - [seu-email@exemplo.com](mailto:seu-email@exemplo.com)
+Seu Nome - [sadircardosojr@gmail.com](mailto:sadircardosojr@gmail.com)
 
 ## 🙏 Agradecimentos
 
