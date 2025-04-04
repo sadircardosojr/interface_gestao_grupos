@@ -1,14 +1,15 @@
-# Estudo de JavaScript - Interface de Condicionais
+# Estudo de JavaScript - Interface de Condições
 
-Este é um repositório de estudo e prática de JavaScript, focado no desenvolvimento de uma interface interativa para gerenciamento de condicionais.
+Este é um repositório de estudo focado no desenvolvimento de uma interface interativa usando JavaScript moderno. O projeto implementa uma interface de construção de condições com funcionalidades de drag and drop, persistência de dados e manipulação de árvore de nós.
 
 ## 🚀 Funcionalidades
 
-- Interface de árvore navegável
-- Sistema de drag and drop para criação e reordenação de condicionais
+- Interface de árvore interativa
+- Sistema de drag and drop para construção de condições
 - Persistência de dados usando localStorage
-- Integração com backend para salvamento de dados
-- Modo de edição para gerenciamento de condicionais
+- Integração com backend para salvar condições
+- Modo de edição para modificar condições existentes
+- Interface responsiva e moderna
 
 ## 🛠️ Tecnologias Utilizadas
 
@@ -23,7 +24,7 @@ Este é um repositório de estudo e prática de JavaScript, focado no desenvolvi
 
 - Node.js instalado
 - PostgreSQL configurado
-- Navegador moderno com suporte a drag and drop
+- Navegador moderno com suporte a ES6+
 
 ## 🔧 Instalação
 
@@ -37,9 +38,7 @@ git clone https://github.com/seu-usuario/estudo-javascript.git
 npm install
 ```
 
-3. Configure o banco de dados:
-- Crie um banco de dados PostgreSQL
-- Configure as credenciais no arquivo de configuração
+3. Configure o banco de dados PostgreSQL
 
 4. Inicie o servidor:
 ```bash
@@ -49,32 +48,29 @@ npm start
 ## 💻 Como Usar
 
 1. Acesse a aplicação no navegador
-2. Navegue pela árvore de nós
-3. Clique em um nó para visualizar suas condicionais
-4. Use o modo de edição para:
-   - Adicionar novas condicionais
-   - Reordenar condicionais existentes
-   - Editar valores
-   - Salvar alterações
+2. Clique em um nó da árvore para selecioná-lo
+3. Use o modo de edição para:
+   - Adicionar novas condições arrastando da toolbox
+   - Reordenar condições existentes
+   - Editar valores das condições
+   - Remover condições
 
 ## 📚 Estrutura do Projeto
 
 ```
-estudo-javascript/
 ├── public/
 │   ├── index.html
 │   ├── styles.css
 │   └── script.js
 ├── server/
-│   ├── server.js
-│   └── database.js
+│   └── server.js
 ├── package.json
 └── README.md
 ```
 
 ## 🤝 Contribuindo
 
-Este é um projeto de estudo, mas sugestões e melhorias são bem-vindas! Sinta-se à vontade para:
+Este é um projeto de estudo, mas contribuições são bem-vindas! Sinta-se à vontade para:
 
 1. Fazer um fork do projeto
 2. Criar uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
@@ -86,12 +82,8 @@ Este é um projeto de estudo, mas sugestões e melhorias são bem-vindas! Sinta-
 
 Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
 
-## 👤 Autor
-
-Sadir - [sadircardosojr@gmail.com](mailto:sadircardosojr@gmail.com)
-
 ## 🙏 Agradecimentos
 
 - [MDN Web Docs](https://developer.mozilla.org/)
-- [W3Schools](https://www.w3schools.com/)
-- [JavaScript.info](https://javascript.info/) 
+- [JavaScript.info](https://javascript.info/)
+- [Express.js](https://expressjs.com/) 
