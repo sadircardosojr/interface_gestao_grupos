@@ -13,6 +13,7 @@ class TreeView {
         this.selectedNodeId = null;
         this.expandedNodes = new Set();
         this.loadState();
+        this.setupModal();
     }
 
     loadState() {
@@ -79,7 +80,7 @@ class TreeView {
         return null;
     }
 
-    createTreeNode(node) {
+    createTreeNode(node, level = 0) {
         const treeItem = document.createElement('div');
         treeItem.className = 'tree-item';
         treeItem.setAttribute('data-node-id', node.id);
@@ -92,6 +93,22 @@ class TreeView {
         
         const nameSpan = document.createElement('span');
         nameSpan.textContent = node.name;
+
+        // Adicionar botão de novo nível apenas se o nível for menor que 2 (neto)
+        if (level < 2) {
+            const addLevelBtn = document.createElement('button');
+            addLevelBtn.className = 'add-level-btn';
+            addLevelBtn.innerHTML = '+';
+            addLevelBtn.title = 'Adicionar novo nível';
+            addLevelBtn.onclick = (e) => {
+                e.stopPropagation();
+                this.currentParentNode = node;
+                this.currentLevel = level;
+                this.modal.classList.add('visible');
+                this.modal.querySelector('.modal-input').focus();
+            };
+            content.appendChild(addLevelBtn);
+        }
         
         content.appendChild(toggleIcon);
         content.appendChild(nameSpan);
@@ -102,7 +119,7 @@ class TreeView {
             childrenContainer.className = 'tree-item-children';
             
             node.children.forEach(child => {
-                childrenContainer.appendChild(this.createTreeNode(child));
+                childrenContainer.appendChild(this.createTreeNode(child, level + 1));
             });
 
             treeItem.appendChild(childrenContainer);
@@ -554,6 +571,182 @@ class TreeView {
             this.data.forEach(node => {
                 this.container.appendChild(this.createTreeNode(node));
             });
+        }
+    }
+
+    setupModal() {
+        // Criar o modal
+        const modal = document.createElement('div');
+        modal.className = 'floating-modal';
+        modal.innerHTML = `
+            <div class="modal-content">
+                <div class="modal-title">Adicionar Novo Nível</div>
+                <input type="text" class="modal-input" placeholder="Digite o nome do novo nível">
+                <div class="modal-buttons">
+                    <button class="modal-button cancel">Cancelar</button>
+                    <button class="modal-button save">Salvar</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+
+        // Configurar eventos dos botões
+        const cancelBtn = modal.querySelector('.cancel');
+        const saveBtn = modal.querySelector('.save');
+        const input = modal.querySelector('.modal-input');
+
+        cancelBtn.addEventListener('click', () => {
+            modal.classList.remove('visible');
+            input.value = '';
+        });
+
+        saveBtn.addEventListener('click', () => {
+            const name = input.value.trim();
+            if (name && this.currentParentNode) {
+                this.addNewLevel(this.currentParentNode, this.currentLevel, name);
+                modal.classList.remove('visible');
+                input.value = '';
+            }
+        });
+
+        // Fechar modal ao clicar fora
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('visible');
+                input.value = '';
+            }
+        });
+
+        // Fechar modal com ESC
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && modal.classList.contains('visible')) {
+                modal.classList.remove('visible');
+                input.value = '';
+            }
+        });
+
+        this.modal = modal;
+    }
+
+    saveToLocalStorage() {
+        // Salvar a estrutura da árvore
+        localStorage.setItem('treeData', JSON.stringify(this.data));
+        
+        // Salvar o estado atual (nós expandidos e selecionados)
+        this.saveState();
+    }
+
+    async addNewLevel(parentNode, currentLevel, name = 'Novo Nível') {
+        console.log('Iniciando adição de novo nível:', {
+            parentNode,
+            currentLevel,
+            name
+        });
+
+        if (currentLevel >= 2) {
+            console.log('Nível máximo atingido (2)');
+            return;
+        }
+
+        const newNode = {
+            id: Date.now(),
+            name: name,
+            children: []
+        };
+
+        console.log('Novo nó criado:', newNode);
+
+        // Garantir que o nó pai tenha um array de filhos
+        if (!parentNode.children) {
+            console.log('Inicializando array de filhos para o nó pai');
+            parentNode.children = [];
+        }
+
+        // Adicionar o novo nó como filho do nó pai
+        parentNode.children.push(newNode);
+        console.log('Nó adicionado ao pai. Filhos do pai:', parentNode.children);
+
+        // Expandir automaticamente o nó pai
+        this.expandedNodes.add(parentNode.id);
+        console.log('Nó pai expandido. Nós expandidos:', Array.from(this.expandedNodes));
+
+        try {
+            console.log('Iniciando requisição para salvar no banco de dados');
+            const requestBody = {
+                parentId: parentNode.id,
+                node: newNode
+            };
+            console.log('Dados da requisição:', requestBody);
+
+            // Salvar no banco de dados
+            const response = await fetch('/api/save-node', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(requestBody)
+            });
+
+            console.log('Status da resposta:', response.status);
+            console.log('Headers da resposta:', Object.fromEntries(response.headers.entries()));
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('Resposta não-ok:', errorText);
+                throw new Error(`Erro ao salvar o novo nível no banco de dados: ${response.status} ${errorText}`);
+            }
+
+            let data;
+            try {
+                data = await response.json();
+                console.log('Dados da resposta:', data);
+            } catch (parseError) {
+                console.error('Erro ao parsear resposta JSON:', parseError);
+                throw new Error('Resposta inválida do servidor: não é um JSON válido');
+            }
+
+            if (!data.success) {
+                console.error('Falha na operação:', data.error);
+                throw new Error(data.error || 'Falha ao salvar o novo nível');
+            }
+
+            // Atualizar o ID do nó com o ID retornado pelo servidor
+            const oldId = newNode.id;
+            newNode.id = data.nodeId;
+            console.log('ID do nó atualizado:', { oldId, newId: data.nodeId });
+
+            // Salvar no localStorage
+            console.log('Salvando no localStorage');
+            this.saveToLocalStorage();
+
+            // Reconstruir a árvore
+            console.log('Reconstruindo a árvore');
+            this.render();
+            this.restoreState();
+
+            // Selecionar o novo nó
+            this.selectedNodeId = newNode.id;
+            this.saveState();
+            console.log('Novo nó selecionado:', this.selectedNodeId);
+
+            console.log('Novo nível adicionado com sucesso:', data.message);
+        } catch (error) {
+            console.error('Erro detalhado ao adicionar novo nível:', {
+                error: error.message,
+                stack: error.stack,
+                parentNode: parentNode.id,
+                newNode: newNode.id
+            });
+            
+            alert('Erro ao adicionar novo nível: ' + error.message);
+            
+            // Remover o nó adicionado em caso de erro
+            const index = parentNode.children.indexOf(newNode);
+            if (index > -1) {
+                console.log('Removendo nó em caso de erro, índice:', index);
+                parentNode.children.splice(index, 1);
+            }
         }
     }
 }

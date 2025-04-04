@@ -119,6 +119,50 @@ app.post('/api/save-conditions', async (req, res) => {
     }
 });
 
+// Rota para salvar um novo nó
+app.post('/api/save-node', async (req, res) => {
+    console.log('Recebendo requisição para salvar novo nó:', req.body);
+    
+    const { parentId, node } = req.body;
+    
+    if (!parentId || !node || !node.name) {
+        return res.status(400).json({ 
+            success: false, 
+            error: 'Dados inválidos. parentId e node.name são obrigatórios.' 
+        });
+    }
+
+    const client = await pool.connect();
+    try {
+        await client.query('BEGIN');
+
+        // Insere o novo nó
+        const result = await client.query(
+            'INSERT INTO nodes (name, parent_id) VALUES ($1, $2) RETURNING id',
+            [node.name, parentId]
+        );
+
+        const newNodeId = result.rows[0].id;
+
+        await client.query('COMMIT');
+        res.json({ 
+            success: true, 
+            message: 'Nó adicionado com sucesso',
+            nodeId: newNodeId
+        });
+    } catch (error) {
+        await client.query('ROLLBACK');
+        console.error('Erro ao salvar nó:', error);
+        res.status(500).json({ 
+            success: false, 
+            error: 'Erro ao salvar nó no banco de dados',
+            details: error.message 
+        });
+    } finally {
+        client.release();
+    }
+});
+
 // Rota para carregar as condições
 app.get('/api/conditions/:nodeId', async (req, res) => {
     try {
